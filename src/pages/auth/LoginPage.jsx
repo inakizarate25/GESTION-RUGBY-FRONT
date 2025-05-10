@@ -8,26 +8,29 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = async (values, { setSubmitting, setErrors }) => {
-    try {
-      // Simulamos login (acá iría el fetch real al backend)
-      const fakeUser = {
-        id: 1,
-        email: values.email,
-        roles: ["jugador"],
-        nombre: "Juan Pérez",
-      };
+  const handleLogin = (values, { setSubmitting, setErrors }) => {
+    // 🔐 Simulación de autenticación
+    const fakeUser = {
+      nombre: "Juan Pérez",
+      email: values.email,
+      roles: ["jugador", "entrenador"], // cambiar según testeo
+    };
 
-      // Validación ficticia
-      if (values.email === "admin@club.com" && values.password === "1234") {
-        dispatch(loginSuccess(fakeUser));
-        navigate("/jugador"); // Cambiar ruta según el rol
-      } else {
-        setErrors({ password: "Credenciales inválidas" });
-      }
-    } catch (error) {
-      setErrors({ password: "Error inesperado" });
+    if (values.email && values.password) {
+      dispatch(loginSuccess(fakeUser));
+
+      // Redirección según primer rol
+      const rutaPorRol = fakeUser.roles.includes("admin")
+        ? "/admin"
+        : fakeUser.roles.includes("entrenador")
+        ? "/entrenador"
+        : "/jugador";
+
+      navigate(rutaPorRol);
+    } else {
+      setErrors({ password: "Credenciales inválidas" });
     }
+
     setSubmitting(false);
   };
 
@@ -49,31 +52,23 @@ const LoginPage = () => {
           {({ isSubmitting }) => (
             <Form className="flex flex-col gap-4">
               <div>
-                <label className="text-white">Email:</label>
+                <label className="text-white">Email</label>
                 <Field
                   name="email"
                   type="email"
                   className="bg-gray-700 w-full p-2 rounded text-white"
                 />
-                <ErrorMessage
-                  name="email"
-                  component="div"
-                  className="text-red-500 text-sm"
-                />
+                <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
               </div>
 
               <div>
-                <label className="text-white">Contraseña:</label>
+                <label className="text-white">Contraseña</label>
                 <Field
                   name="password"
                   type="password"
                   className="bg-gray-700 w-full p-2 rounded text-white"
                 />
-                <ErrorMessage
-                  name="password"
-                  component="div"
-                  className="text-red-500 text-sm"
-                />
+                <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
               </div>
 
               <button
